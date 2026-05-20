@@ -182,7 +182,7 @@ body::before {
   display: flex; align-items: center; gap: 20px;
   font-family: var(--font-mono); font-size: 11px;
   color: var(--text-3); text-transform: uppercase; letter-spacing: 0.18em;
-  margin-bottom: 56px;
+  margin-top: 24px; margin-bottom: 28px;
 }
 .hero .topline .seg { display: flex; align-items: center; gap: 8px; }
 .hero .topline .sep { width: 1px; height: 10px; background: var(--hairline-2); }
@@ -660,6 +660,28 @@ body::before {
   align-self: flex-start; cursor: pointer;
 }
 
+.liquid-metal-btn {
+  margin-top: 12px;
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 16px 22px; border-radius: 100px;
+  color: #0a0a0c;
+  font-family: var(--font-mono); font-size: 12px;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+  align-self: flex-start; cursor: pointer;
+  border: none;
+  transition: filter var(--motion-fast) var(--ease);
+}
+
+.liquid-metal-btn:hover {
+  filter: brightness(1.15);
+}
+.liquid-metal-btn canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* Footer */
 footer {
   margin-top: 80px; padding: 40px 0 60px;
@@ -750,6 +772,11 @@ footer .shell {
   letter-spacing: -0.03em;
 }
 .cs-title-row h2 .dot { font-style: italic; opacity: 0.45; }
+.cs-title-row .cs-stack {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding-bottom: 2px; align-items: flex-end; justify-content: flex-end;
+  max-width: 360px;
+}
 .cs-title-row .cs-title-meta {
   display: flex; gap: 32px; padding-bottom: 18px;
 }
@@ -838,6 +865,14 @@ footer .shell {
 }
 
 /* Overview + stack card */
+.cs-overview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.cs-overview-content {
+  flex: 1;
+}
 .cs-overview p {
   margin: 0 0 12px;
   color: var(--text-2);
@@ -848,7 +883,6 @@ footer .shell {
 .cs-overview p:last-of-type { margin-bottom: 18px; }
 .cs-stack {
   display: flex; flex-wrap: wrap; gap: 6px;
-  padding-top: 16px; border-top: 1px solid var(--hairline);
 }
 .cs-stack .chip {
   padding: 5px 9px; border-radius: 6px;
@@ -935,9 +969,15 @@ footer .shell {
 .cs-thumb.active img { opacity: 1; }
 
 /* Features card */
+.cs-features-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 .cs-features-list {
   list-style: none; margin: 0; padding: 0;
   display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  flex: 1;
 }
 .cs-features-list li {
   display: grid;

@@ -325,6 +325,11 @@ function Hero({ ripple, rippleSpeed = 1, rippleOrigin }) {
         </div>
       }
       <div className="hero-stage">
+      <h1>
+        <span className="it" style={{ letterSpacing: "-0.1px", padding: "0 0 0 10px" }}>Alex</span><br />
+        <span className="ch">Chopoyhlu</span>
+        <span style={{ fontStyle: 'italic', opacity: 0.55 }}>.</span>
+      </h1>
       <div className="topline">
         <div className="seg"><span>v2.6 · 2026</span></div>
         <div className="sep" />
@@ -332,11 +337,6 @@ function Hero({ ripple, rippleSpeed = 1, rippleOrigin }) {
         <div className="sep" />
         <div className="seg"><span>Designer + Developer</span></div>
       </div>
-      <h1>
-        <span className="it" style={{ letterSpacing: "-0.1px", padding: "0 0 0 10px" }}>Alex</span><br />
-        <span className="ch">Chopoyhlu</span>
-        <span style={{ fontStyle: 'italic', opacity: 0.55 }}>.</span>
-      </h1>
       <div className="tagline">
         <span style={{ fontFamily: '"Instrument Serif"', padding: "0 0 10px" }}>Making mobile feel simple again. Five shipped iOS apps and a recurring habit of breaking interfaces apart and reassembling them better.</span>
       </div>
@@ -687,6 +687,74 @@ function Pricing() {
 
 }
 
+// ── Liquid Metal Button ───────────────────────────────────────
+function LiquidMetalButton({ href, children }) {
+  const containerRef = useRef(null);
+  const [shaderLoaded, setShaderLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const loadShader = async () => {
+      try {
+        // Wrap the dynamic import in a Function so Babel-standalone (which
+        // transpiles this file in-browser) doesn't rewrite it into a broken
+        // CommonJS require() — this forces a real native ESM import.
+        const nativeImport = new Function('url', 'return import(url)');
+        const module = await nativeImport("https://esm.sh/@paper-design/shaders");
+        const { liquidMetalFragmentShader, ShaderMount } = module;
+
+        new ShaderMount(
+          containerRef.current,
+          liquidMetalFragmentShader,
+          {
+            u_repetition: 1.5,
+            u_softness: 0.5,
+            u_shiftRed: 0.3,
+            u_shiftBlue: 0.3,
+            u_distortion: 0,
+            u_contour: 0,
+            u_angle: 100,
+            u_scale: 12,
+            u_shape: 1,
+            u_offsetX: 0,
+            u_offsetY: 0
+          },
+          undefined,
+          0.6
+        );
+        setShaderLoaded(true);
+      } catch (err) {
+        console.error("Failed to load shader:", err);
+      }
+    };
+
+    loadShader();
+  }, []);
+
+  return (
+    <a
+      href={href}
+      className="liquid-metal-btn"
+      style={{ position: 'relative', display: 'inline-flex' }}>
+      <div
+        ref={containerRef}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '100px',
+          overflow: 'hidden',
+          pointerEvents: 'none',
+          background: shaderLoaded ? 'transparent' : 'var(--chrome)'
+        }}
+      />
+      <span style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {children}
+      </span>
+    </a>
+  );
+}
+
 // ── Contact ───────────────────────────────────────────────────
 function Contact() {
   return (
@@ -729,7 +797,7 @@ function Contact() {
           <div className="meta" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>FOR HIRE</div>
           <h3>Got an app<br />in your head?</h3>
           <p>Let's put it on a phone. Fixed scope, weekly demos, no consultancy nonsense.</p>
-          <a className="btn" href="mailto:alex.chopoyhlu@outlook.com">Start a conversation <span>→</span></a>
+          <LiquidMetalButton href="mailto:alex.chopoyhlu@outlook.com">Start a conversation <span>→</span></LiquidMetalButton>
         </div>
       </div>
     </section>);
@@ -813,6 +881,9 @@ function CaseStudyLayout({ app, isOpen }) {
           {app.icon && <img src={app.icon} alt={app.name} style={{ width: '90px', height: '90px', borderRadius: '14px', flexShrink: 0 }} />}
           <h2>{app.name}<span className="dot">.</span></h2>
         </div>
+        <div className="cs-stack">
+          {app.stack.map((s) => <span key={s} className="chip">{s}</span>)}
+        </div>
       </div>
 
       <div className="cs-grid">
@@ -841,10 +912,9 @@ function CaseStudyLayout({ app, isOpen }) {
           </section>
 
           <section className="cs-card cs-overview" style={{ '--cs-d': '180ms' }}>
-            <div className="cs-card-head"><span className="cs-eyebrow">// overview &amp; stack</span></div>
-            {app.overview.map((p, i) => <p key={i}>{p}</p>)}
-            <div className="cs-stack">
-              {app.stack.map((s) => <span key={s} className="chip">{s}</span>)}
+            <div className="cs-card-head"><span className="cs-eyebrow">// overview</span></div>
+            <div className="cs-overview-content">
+              {app.overview.map((p, i) => <p key={i}>{p}</p>)}
             </div>
           </section>
         </div>
@@ -856,7 +926,8 @@ function CaseStudyLayout({ app, isOpen }) {
             setActive={setActive}
             Screen={Screen}
             tint={app.tint}
-            appName={app.name} />
+            appName={app.name}
+            caseStudyMockups={app.caseStudyMockups} />
 
           <section className="cs-card cs-features-card" style={{ '--cs-d': '260ms' }}>
             <div className="cs-card-head"><span className="cs-eyebrow">// features</span></div>
@@ -875,8 +946,9 @@ function CaseStudyLayout({ app, isOpen }) {
     </div>);
 }
 
-function CaseGallery({ gallery, active, setActive, Screen, tint, appName }) {
-  if (!gallery) {
+function CaseGallery({ gallery, active, setActive, Screen, tint, appName, caseStudyMockups }) {
+  const displayGallery = caseStudyMockups || gallery;
+  if (!displayGallery) {
     return (
       <div className="cs-gallery cs-gallery-empty" style={{ '--cs-d': '200ms', '--cs-tint': tint || 'var(--accent-glow)' }}>
         <div className="cs-gallery-main is-device">
@@ -890,8 +962,8 @@ function CaseGallery({ gallery, active, setActive, Screen, tint, appName }) {
       </div>);
   }
 
-  const thumbs = gallery;
-  const big = gallery[active % gallery.length];
+  const thumbs = displayGallery;
+  const big = displayGallery[active % displayGallery.length];
 
   return (
     <div className="cs-gallery" style={{ '--cs-d': '200ms', '--cs-tint': tint || 'var(--accent-glow)' }}>
@@ -903,13 +975,13 @@ function CaseGallery({ gallery, active, setActive, Screen, tint, appName }) {
           alt={`${appName} mockup`}
           className="cs-gallery-main-img" />
         <div className="cs-gallery-counter">
-          {String((active % gallery.length) + 1).padStart(2, '0')} <span>/ {String(gallery.length).padStart(2, '0')}</span>
+          {String((active % displayGallery.length) + 1).padStart(2, '0')} <span>/ {String(displayGallery.length).padStart(2, '0')}</span>
         </div>
       </div>
       <div className="cs-gallery-thumbs">
         {thumbs.map((src, i) => {
-          const galleryIdx = i % gallery.length;
-          const isActive = galleryIdx === active % gallery.length;
+          const galleryIdx = i % displayGallery.length;
+          const isActive = galleryIdx === active % displayGallery.length;
           return (
             <button
               key={i}
