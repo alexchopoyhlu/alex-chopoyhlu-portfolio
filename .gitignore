@@ -1,0 +1,10 @@
+# OS / editor
+.DS_Store
+
+# Local agent / tooling state
+.claude/
+
+# Unreferenced heavy folders — not used by the site (16M+). Remove these
+# lines if you want them tracked.
+uploads/
+screenshots/

@@ -1,0 +1,7 @@
+# Unreferenced heavy folders — not used by the site
+uploads/
+screenshots/
+
+# Local tooling / editor state
+.claude/
+.DS_Store
