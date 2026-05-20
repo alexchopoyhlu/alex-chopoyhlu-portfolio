@@ -443,11 +443,11 @@ function AppCard({ app, index, motion, mockupSpeed, mockupSpacing, mockupSize, o
           <span className="arr" />
         </div>
       </div>
-      <MockupStage tint={app.tint} app={app} motion={motion} speed={mockupSpeed} spacing={mockupSpacing} size={mockupSize} />
+      <MockupStage tint={app.tint} app={app} motion={motion} speed={mockupSpeed} spacing={mockupSpacing} size={mockupSize} reverse={index % 2 === 1} />
     </article>);
 }
 
-function MockupStage({ tint, app, motion, speed = 1, spacing = 1.25, size = 1 }) {
+function MockupStage({ tint, app, motion, speed = 1, spacing = 1.25, size = 1, reverse = false }) {
   // Drive the animation by writing transforms directly to refs each frame —
   // no React re-render in the hot loop. This is what makes it feel smooth.
   const cardRefs = [useRef(null), useRef(null), useRef(null)];
@@ -484,7 +484,8 @@ function MockupStage({ tint, app, motion, speed = 1, spacing = 1.25, size = 1 })
         const local = (phase + i / 3) % 1;
         const sCurve = Math.sin(local * Math.PI); // 0..1..0 — peaks at centre
         const eased = smoothstep(sCurve);
-        const xFrac = 0.5 - local; // +0.5 → -0.5
+        const dir = reverse ? -1 : 1;
+        const xFrac = (0.5 - local) * dir; // travel direction flips on reversed cards
         const x = xFrac * X_RANGE * 2;
         const y = -eased * 28 + 12;
         const r = xFrac * 18 * (1 - eased * 0.35);
@@ -500,7 +501,7 @@ function MockupStage({ tint, app, motion, speed = 1, spacing = 1.25, size = 1 })
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [motion]);
+  }, [motion, reverse]);
 
   return (
     <div className="mockup-stage" style={tint ? { '--accent-glow': tint } : {}}>
@@ -807,18 +808,16 @@ function CaseStudyLayout({ app, isOpen }) {
 
   return (
     <div className={`cs-layout ${isOpen ? 'in' : ''}`}>
-      <div className="cs-title-row" style={{ '--cs-d': '60ms' }}>
-        <h2>{app.name}<span className="dot">.</span></h2>
-        <div className="cs-title-meta">
-          <div><span className="k">Year</span><span className="v">{app.year}</span></div>
-          <div><span className="k">Status</span><span className="v">{app.statusLabel}</span></div>
-          <div><span className="k">Role</span><span className="v">{app.role}</span></div>
+      <div className="cs-title-row" style={{ '--cs-d': '30ms' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          {app.icon && <img src={app.icon} alt={app.name} style={{ width: '90px', height: '90px', borderRadius: '14px', flexShrink: 0 }} />}
+          <h2>{app.name}<span className="dot">.</span></h2>
         </div>
       </div>
 
       <div className="cs-grid">
         <div className="cs-col cs-col-left">
-          <section className="cs-card cs-info" style={{ '--cs-d': '140ms' }}>
+          <section className="cs-card cs-info" style={{ '--cs-d': '80ms' }}>
             <div className="cs-card-head"><span className="cs-eyebrow">// info</span></div>
             <div className="cs-tagline">{app.one}</div>
             <ul className="cs-info-list">
@@ -829,7 +828,7 @@ function CaseStudyLayout({ app, isOpen }) {
             </ul>
           </section>
 
-          <section className="cs-card cs-numbers" style={{ '--cs-d': '220ms' }}>
+          <section className="cs-card cs-numbers" style={{ '--cs-d': '130ms' }}>
             <div className="cs-card-head"><span className="cs-eyebrow">// numbers</span></div>
             <div className="cs-numbers-grid">
               {app.metrics.map((m, i) => (
@@ -841,7 +840,7 @@ function CaseStudyLayout({ app, isOpen }) {
             </div>
           </section>
 
-          <section className="cs-card cs-overview" style={{ '--cs-d': '300ms' }}>
+          <section className="cs-card cs-overview" style={{ '--cs-d': '180ms' }}>
             <div className="cs-card-head"><span className="cs-eyebrow">// overview &amp; stack</span></div>
             {app.overview.map((p, i) => <p key={i}>{p}</p>)}
             <div className="cs-stack">
@@ -859,7 +858,7 @@ function CaseStudyLayout({ app, isOpen }) {
             tint={app.tint}
             appName={app.name} />
 
-          <section className="cs-card cs-features-card" style={{ '--cs-d': '520ms' }}>
+          <section className="cs-card cs-features-card" style={{ '--cs-d': '260ms' }}>
             <div className="cs-card-head"><span className="cs-eyebrow">// features</span></div>
             <ul className="cs-features-list">
               {app.features.map((f, i) => (
@@ -879,7 +878,7 @@ function CaseStudyLayout({ app, isOpen }) {
 function CaseGallery({ gallery, active, setActive, Screen, tint, appName }) {
   if (!gallery) {
     return (
-      <div className="cs-gallery cs-gallery-empty" style={{ '--cs-d': '320ms', '--cs-tint': tint || 'var(--accent-glow)' }}>
+      <div className="cs-gallery cs-gallery-empty" style={{ '--cs-d': '200ms', '--cs-tint': tint || 'var(--accent-glow)' }}>
         <div className="cs-gallery-main is-device">
           <div className="cs-gallery-tint" />
           <div className="cs-phone-wrap">
@@ -891,12 +890,12 @@ function CaseGallery({ gallery, active, setActive, Screen, tint, appName }) {
       </div>);
   }
 
-  const thumbs = Array.from({ length: 4 }, (_, i) => gallery[i % gallery.length]);
+  const thumbs = gallery;
   const big = gallery[active % gallery.length];
 
   return (
-    <div className="cs-gallery" style={{ '--cs-d': '320ms', '--cs-tint': tint || 'var(--accent-glow)' }}>
-      <div className="cs-gallery-main" style={{ '--cs-d': '360ms' }}>
+    <div className="cs-gallery" style={{ '--cs-d': '200ms', '--cs-tint': tint || 'var(--accent-glow)' }}>
+      <div className="cs-gallery-main" style={{ '--cs-d': '220ms' }}>
         <div className="cs-gallery-tint" />
         <img
           key={big}
@@ -916,7 +915,7 @@ function CaseGallery({ gallery, active, setActive, Screen, tint, appName }) {
               key={i}
               type="button"
               className={`cs-thumb cs-thumb-${i} ${isActive ? 'active' : ''}`}
-              style={{ '--cs-d': `${380 + i * 60}ms` }}
+              style={{ '--cs-d': `${200 + i * 50}ms` }}
               onClick={() => setActive(galleryIdx)}
               aria-label={`Show mockup ${galleryIdx + 1}`}>
               <img src={src} alt="" />

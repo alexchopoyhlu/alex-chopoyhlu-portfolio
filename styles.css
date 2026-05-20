@@ -44,6 +44,7 @@ html, body {
   line-height: 1.55;
   letter-spacing: -0.005em;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -133,7 +134,7 @@ body::before {
   /* The chrome A reads well as-is on the dark nav */
 }
 .nav .brand:hover { transform: scale(1.04); }
-.nav .links { display: flex; gap: 28px; }
+.nav .links { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 28px; }
 .nav .links a {
   font-family: var(--font-mono); font-size: 11px; color: var(--text-2);
   text-transform: uppercase; letter-spacing: 0.16em;
@@ -332,6 +333,22 @@ body::before {
 }
 .app-card:hover .open-arrow .arr { width: 50px; background: var(--accent); }
 .app-card:hover .open-arrow .arr::after { color: var(--accent); }
+
+/* Alternating layout — flip every even card so details/carousel swap sides.
+   Desktop only; below 980px cards stack to a single column. */
+@media (min-width: 981px) {
+  .app-card:nth-child(even) {
+    grid-template-columns: 1.4fr minmax(340px, 1fr);
+  }
+  .app-card:nth-child(even) .mockup-stage { grid-column: 1; grid-row: 1; }
+  .app-card:nth-child(even) .info {
+    grid-column: 2;
+    grid-row: 1;
+    border-right: none;
+    border-left: 1px solid var(--hairline);
+  }
+  .app-card:nth-child(even) .glow { inset: -40% auto auto -10%; }
+}
 
 /* ── Mockup stage — animated fanned deck of placeholder mockups ───── */
 .mockup-stage {
@@ -843,16 +860,15 @@ footer .shell {
 
 /* Gallery */
 .cs-gallery {
-  display: grid;
-  grid-template-columns: 1fr 1fr 0.8fr;
-  grid-template-areas:
-    "main main main"
-    "t0 t1 t1"
-    "t2 t2 t3";
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cs-gallery-thumbs {
+  display: flex;
   gap: 12px;
 }
 .cs-gallery-main {
-  grid-area: main;
   position: relative; overflow: hidden;
   border: 1px solid var(--hairline);
   border-radius: 18px;
@@ -895,6 +911,8 @@ footer .shell {
 .cs-gallery-counter span { color: rgba(255,255,255,0.5); }
 
 .cs-thumb {
+  flex: 1 1 0;
+  min-width: 0;
   position: relative; overflow: hidden;
   border: 1px solid var(--hairline);
   border-radius: 14px;
@@ -915,10 +933,6 @@ footer .shell {
   box-shadow: 0 0 0 1px var(--text), 0 8px 24px rgba(0,0,0,0.4);
 }
 .cs-thumb.active img { opacity: 1; }
-.cs-thumb-0 { grid-area: t0; }
-.cs-thumb-1 { grid-area: t1; }
-.cs-thumb-2 { grid-area: t2; }
-.cs-thumb-3 { grid-area: t3; }
 
 /* Features card */
 .cs-features-list {
@@ -959,8 +973,8 @@ footer .shell {
   opacity: 0;
   transform: translateY(18px);
   transition:
-    opacity 520ms var(--ease),
-    transform 620ms var(--ease);
+    opacity 700ms var(--ease),
+    transform 800ms var(--ease);
   transition-delay: var(--cs-d, 0ms);
 }
 .cs-layout.in > *,
@@ -1117,7 +1131,7 @@ footer .shell {
 .hero-ripple {
   position: absolute;
   top: 40px;
-  right: -120px;
+  right: 0;
   width: 720px;
   height: 720px;
   pointer-events: none;
@@ -1153,7 +1167,7 @@ footer .shell {
 /* float disabled — was distracting */
 
 @media (max-width: 1180px) {
-  .hero-ripple { right: -200px; width: 620px; height: 620px; opacity: 0.7; }
+  .hero-ripple { right: 0; width: 620px; height: 620px; opacity: 0.7; }
 }
 @media (max-width: 880px) {
   .hero-ripple {
